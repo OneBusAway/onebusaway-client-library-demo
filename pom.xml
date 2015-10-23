@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.onebusaway</groupId>
+	<artifactId>onebusaway-client-library-demo</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>OneBusAway Client Library Demo</name>
+	<description>A simple demo application that uses the Java client library for the OneBusAway REST APIs</description>
+
+	<repositories>
+		<repository>
+			<id>public.onebusaway.org</id>
+			<url>http://nexus.onebusaway.org/content/groups/public/</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.onebusaway</groupId>
+			<artifactId>onebusaway-client-library</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+			<plugin>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<shadedClassifierName>withAllDependencies</shadedClassifierName>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>org.onebusaway.io.client.demo.OneBusAwayClientLibraryDemo</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+        </plugins>
+    </build>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<distribution_id>nexus.onebusaway.org-releases</distribution_id>
+		<distribution_name>OneBusAway Nexus Release Repository</distribution_name>
+		<distribution_url>http://nexus.onebusaway.org/content/repositories/releases/</distribution_url>
+		<snapshot_distribution_id>nexus.onebusaway.org-snapshots</snapshot_distribution_id>
+		<snapshot_distribution_name>OneBusAway Nexus Snapshots Repository</snapshot_distribution_name>
+		<snapshot_distribution_url>http://nexus.onebusaway.org/content/repositories/snapshots/</snapshot_distribution_url>
+		<site_id>developer.onebusaway.org</site_id>
+		<site_deployment_base>scp://developer.onebusaway.org/var/www/sites/developer/modules</site_deployment_base>
+		<site_url>${site_deployment_base}/${project.name}/${project.version}</site_url>
+		<site_base_url>http://developer.onebusaway.org/modules</site_base_url>
+		<maven_javadoc_plugin_version>2.7</maven_javadoc_plugin_version>
+		<maven_project_info_reports_plugin_version>2.4</maven_project_info_reports_plugin_version>
+	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>${distribution_id}</id>
+			<name>${distribution_name}</name>
+			<url>${distribution_url}</url>
+		</repository>
+		<snapshotRepository>
+			<id>${snapshot_distribution_id}</id>
+			<name>${snapshot_distribution_name}</name>
+			<url>${snapshot_distribution_url}</url>
+		</snapshotRepository>
+		<site>
+			<id>${site_id}</id>
+			<url>${site_url}</url>
+		</site>
+	</distributionManagement>
+</project>
