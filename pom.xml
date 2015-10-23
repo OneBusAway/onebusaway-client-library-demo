@@ -47,6 +47,7 @@
 									<mainClass>org.onebusaway.io.client.demo.OneBusAwayClientLibraryDemo</mainClass>
 								</transformer>
 							</transformers>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
 						</configuration>
 					</execution>
 				</executions>
