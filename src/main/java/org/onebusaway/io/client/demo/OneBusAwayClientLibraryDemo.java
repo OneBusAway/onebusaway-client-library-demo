@@ -36,12 +36,8 @@ public class OneBusAwayClientLibraryDemo {
         ObaApi.getDefaultContext().setApiKey("TEST");
         ObaRegionsResponse response = null;
 
-        try {
-            // Call the OBA Regions API (http://regions.onebusaway.org/regions-v3.json)
-            response = ObaRegionsRequest.newRequest().call();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        // Call the OBA Regions API (http://regions.onebusaway.org/regions-v3.json)
+        response = ObaRegionsRequest.newRequest().call();
         ArrayList<ObaRegion> regions = new ArrayList<ObaRegion>(Arrays.asList(response.getRegions()));
         for (ObaRegion r : regions) {
             if (r.getName().equalsIgnoreCase("Tampa")) {
@@ -60,7 +56,11 @@ public class OneBusAwayClientLibraryDemo {
 
         // Set the custom API
         String url = "http://api.tampa.onebusaway.org/api/";
-        ObaApi.getDefaultContext().setBaseUrl(url);
+        try {
+            ObaApi.getDefaultContext().setBaseUrl(url);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
 
         // Get the stops from a custom API
         callGetStops();
@@ -70,17 +70,13 @@ public class OneBusAwayClientLibraryDemo {
         Location l = new Location("Test");
         l.setLatitude(28.0664191);
         l.setLongitude(-82.4298721);
-        ObaStopsForLocationResponse response2 = null;
+        ObaStopsForLocationResponse response = null;
         // Call the OBA stops-for-location API (http://developer.onebusaway.org/modules/onebusaway-application-modules/current/api/where/methods/stops-for-location.html)
-        try {
-            response2 = new ObaStopsForLocationRequest.Builder(l)
-                    .setQuery("3105")  // Request info for stop ID 3105
-                    .build()
-                    .call();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        final ObaStop[] list = response2.getStops();
+        response = new ObaStopsForLocationRequest.Builder(l)
+                .setQuery("3105")  // Request info for stop ID 3105
+                .build()
+                .call();
+        final ObaStop[] list = response.getStops();
         for (ObaStop s : list) {
             System.out.println(s.getName() + "\n");
         }
