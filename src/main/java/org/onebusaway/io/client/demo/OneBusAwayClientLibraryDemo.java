@@ -17,68 +17,61 @@ package org.onebusaway.io.client.demo;
 
 import org.onebusaway.io.client.ObaApi;
 import org.onebusaway.io.client.elements.ObaRegion;
-import org.onebusaway.io.client.elements.ObaStop;
+import org.onebusaway.io.client.request.ObaAgenciesWithCoverageRequest;
+import org.onebusaway.io.client.request.ObaAgenciesWithCoverageResponse;
 import org.onebusaway.io.client.request.ObaRegionsRequest;
 import org.onebusaway.io.client.request.ObaRegionsResponse;
-import org.onebusaway.io.client.request.ObaStopsForLocationRequest;
-import org.onebusaway.io.client.request.ObaStopsForLocationResponse;
-import org.onebusaway.location.Location;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static org.onebusaway.io.client.ObaApi.OBA_OK;
+
 public class OneBusAwayClientLibraryDemo {
 
-    public static void main(String[] args) throws IOException {
+    static final int LOOP_COUNT = 10;
+    static final long SLEEP_TIME_MS = 0;
+    static final String API_KEY = "e5c0e97a-729d-4fdb-a3ca-2fccb20ac3ab";
+
+    public static void main(String[] args) throws IOException, InterruptedException {
         // Set the API key to be used - should be changed to your API key
-        ObaApi.getDefaultContext().setApiKey("TEST");
+        ObaApi.getDefaultContext().setApiKey(API_KEY);
         ObaRegionsResponse response = null;
 
         // Call the OBA Regions API (http://regions.onebusaway.org/regions-v3.json)
         response = ObaRegionsRequest.newRequest().call();
         ArrayList<ObaRegion> regions = new ArrayList<ObaRegion>(Arrays.asList(response.getRegions()));
         for (ObaRegion r : regions) {
-            if (r.getName().equalsIgnoreCase("Tampa")) {
-                ObaApi.getDefaultContext().setRegion(r);
-                // Get the stops for the region named "Tampa"
-                callGetStops();
+            if (r.getExperimental() || !r.getSupportsObaRealtimeApis() || !r.getSupportsObaDiscoveryApis()) {
+                continue;
+            }
+            ObaApi.getDefaultContext().setRegion(r);
+            long after = 0;
+
+            for (int i = 0; i < LOOP_COUNT; i++) {
+                Thread.sleep(SLEEP_TIME_MS);
+                if (i != 0) {
+                    long elapsed = System.currentTimeMillis() - after;
+                    System.out.println("Elapsed time = " + elapsed + "ms");
+                }
+                callGetAgenciesWithCoverage(r);
+                after = System.currentTimeMillis();
             }
         }
-
-        /**
-         * An example of setting a custom API server
-         */
-
-        // First, clear the region, if it was already set
-        ObaApi.getDefaultContext().setRegion(null);
-
-        // Set the custom API
-        String url = "http://api.tampa.onebusaway.org/api/";
-        try {
-            ObaApi.getDefaultContext().setBaseUrl(url);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        // Get the stops from a custom API
-        callGetStops();
     }
 
-    private static void callGetStops() throws IOException {
-        Location l = new Location("Test");
-        l.setLatitude(28.0664191);
-        l.setLongitude(-82.4298721);
-        ObaStopsForLocationResponse response = null;
-        // Call the OBA stops-for-location API (http://developer.onebusaway.org/modules/onebusaway-application-modules/current/api/where/methods/stops-for-location.html)
-        response = new ObaStopsForLocationRequest.Builder(l)
-                .setQuery("3105")  // Request info for stop ID 3105
+    private static void callGetAgenciesWithCoverage(ObaRegion r) throws IOException {
+        ObaAgenciesWithCoverageResponse response = new ObaAgenciesWithCoverageRequest.Builder()
                 .build()
                 .call();
-        final ObaStop[] list = response.getStops();
-        for (ObaStop s : list) {
-            System.out.println(s.getName() + "\n");
+        if (response.getCode() != OBA_OK) {
+            System.out.println(r.getName() + " - response code = " + response.getCode() + ", text = " + response.getText());
+            throw new IOException(r.getName() + " - response code = " + response.getCode() + ", text = " + response.getText());
         }
+//        ObaAgencyWithCoverage[] agencies = response.getAgencies();
+//        for (int i = 0; i < agencies.length; i++) {
+//            System.out.println("Agency = " + response.getAgency(agencies[i].getId()).getName());
+//        }
     }
 }
