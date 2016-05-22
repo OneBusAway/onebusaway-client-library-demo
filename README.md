@@ -3,7 +3,7 @@ A demo app for the usage of the [onebusaway-client-library](https://github.com/O
 
 ### Requirements
 
-You'll need [JDK 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html), and [Apache Maven](https://maven.apache.org/index.html).
+You'll need [JDK 7 or higher](http://www.oracle.com/technetwork/java/javase/downloads/index.html), and [Apache Maven](https://maven.apache.org/index.html).
 
 ### Usage
 
