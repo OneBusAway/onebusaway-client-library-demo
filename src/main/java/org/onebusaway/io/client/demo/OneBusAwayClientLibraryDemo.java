@@ -17,10 +17,8 @@ package org.onebusaway.io.client.demo;
 
 import org.onebusaway.io.client.ObaApi;
 import org.onebusaway.io.client.elements.ObaRegion;
-import org.onebusaway.io.client.request.ObaAgenciesWithCoverageRequest;
-import org.onebusaway.io.client.request.ObaAgenciesWithCoverageResponse;
-import org.onebusaway.io.client.request.ObaRegionsRequest;
-import org.onebusaway.io.client.request.ObaRegionsResponse;
+import org.onebusaway.io.client.request.*;
+import org.onebusaway.location.Location;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,9 +28,9 @@ import static org.onebusaway.io.client.ObaApi.OBA_OK;
 
 public class OneBusAwayClientLibraryDemo {
 
-    static final int LOOP_COUNT = 10;
-    static final long SLEEP_TIME_MS = 0;
-    static final String API_KEY = "e5c0e97a-729d-4fdb-a3ca-2fccb20ac3ab";
+    static final int LOOP_COUNT = 10000;
+    static final long SLEEP_TIME_MS = 100;
+    static final String API_KEY = "TEST";
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // Set the API key to be used - should be changed to your API key
@@ -43,7 +41,7 @@ public class OneBusAwayClientLibraryDemo {
         response = ObaRegionsRequest.newRequest().call();
         ArrayList<ObaRegion> regions = new ArrayList<ObaRegion>(Arrays.asList(response.getRegions()));
         for (ObaRegion r : regions) {
-            if (r.getExperimental() || !r.getSupportsObaRealtimeApis() || !r.getSupportsObaDiscoveryApis()) {
+            if (r.getExperimental() || !r.getSupportsObaRealtimeApis() || !r.getSupportsObaDiscoveryApis() || r.getId() != 1) {
                 continue;
             }
             ObaApi.getDefaultContext().setRegion(r);
@@ -55,7 +53,7 @@ public class OneBusAwayClientLibraryDemo {
                     long elapsed = System.currentTimeMillis() - after;
                     System.out.println("Elapsed time = " + elapsed + "ms");
                 }
-                callGetAgenciesWithCoverage(r);
+                callGetStopsForLocationPugetSound();
                 after = System.currentTimeMillis();
             }
         }
@@ -73,5 +71,18 @@ public class OneBusAwayClientLibraryDemo {
 //        for (int i = 0; i < agencies.length; i++) {
 //            System.out.println("Agency = " + response.getAgency(agencies[i].getId()).getName());
 //        }
+    }
+
+    private static void callGetStopsForLocationPugetSound() throws IOException {
+        Location l = new Location("test");
+        l.setLatitude(47.61854184);
+        l.setLongitude(122.32673695);
+        ObaStopsForLocationResponse response = new ObaStopsForLocationRequest.Builder(l)
+                .build()
+                .call();
+        if (response.getCode() != OBA_OK) {
+            System.out.println("Stops-for-location() response code = " + response.getCode() + ", text = " + response.getText());
+            throw new IOException("Stops-for-location() response code = " + response.getCode() + ", text = " + response.getText());
+        }
     }
 }
