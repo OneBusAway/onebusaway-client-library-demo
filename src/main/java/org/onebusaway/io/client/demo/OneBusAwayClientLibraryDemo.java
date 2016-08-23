@@ -51,7 +51,7 @@ public class OneBusAwayClientLibraryDemo {
                 Thread.sleep(SLEEP_TIME_MS);
                 if (i != 0) {
                     long elapsed = System.currentTimeMillis() - after;
-                    System.out.println("Elapsed time = " + elapsed + "ms");
+                    System.out.println(i + " - Elapsed time = " + elapsed + "ms");
                 }
                 callGetStopsForLocationPugetSound();
                 after = System.currentTimeMillis();
